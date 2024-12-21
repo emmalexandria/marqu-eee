@@ -65,7 +65,7 @@ export class MarqueeeElement extends HTMLElement {
 		this.direction = "left";
 		this.duration = "10s";
 		this.center = "";
-		this.loop = "-1";
+		this.loop = "infinite";
 		this.behavior = "scroll"
 		this.repeats = 0
 
@@ -103,9 +103,7 @@ export class MarqueeeElement extends HTMLElement {
 				display: block;
 				text-align: initial;
 				overflow: hidden;
-	
 			}
-
 
 			.wrapper {
 				display: flex;
@@ -121,7 +119,7 @@ export class MarqueeeElement extends HTMLElement {
 				display: block;
 				overflow: clip;
 				width: 100%;
-				transform: translateX(-100%);
+				transform: ${this.behavior === "slide" ? "" : "translateX(-100%)"};
 				animation: ${this.getAnimationString()};
 				margin: ${this.getSlotMargin()};
 			}
@@ -133,41 +131,65 @@ width: 100%;
 
 		this.shadow.adoptedStyleSheets = [stylesheet]
 
+		const textWidth = this.textWidth()
+		const textHeight = this.textHeight()
+
 		const animationX = `
 			@keyframes marquee-x {
 				0% {
 					transform: translateX(100%);
 				}
-				100% {transform: translateX(-${this.textWidth()}px);}
+				100% {transform: translateX(-${textWidth}px);}
 			}
 		`
 
+		const animationXSlide = `
+		@keyframes marquee-x-slide {
+				0% {
+					transform: translateX(100%);
+				}
+				100% {transform: translateX(0%);}
+			}		`
+
 		const animationXAlt = `@keyframes marquee-x-alt {
-				0% {transform: translateX(calc(100% - ${this.textWidth()}px ));}
+				0% {transform: translateX(calc(100% - ${textWidth}px ));}
 				25% {transform: translateX(0%);}
-				50% {transform: translateX(calc(100% - ${this.textWidth()}px));}
+				50% {transform: translateX(calc(100% - ${textWidth}px));}
 				75% {transform: translateX(0%);}
-				100% {transform: translateX(calc(100% - ${this.textWidth()}px));}
+				100% {transform: translateX(calc(100% - ${textWidth}px));}
 		}`
 		const animationY = `@keyframes marquee-y{
 				0% { transform: translateY(100%); }
-				100% {transform: translateY(calc(0% - ${this.textHeight()}px));}
+				100% {transform: translateY(calc(0% - ${textHeight}px));}
 			}
 		`
 
+		const animationYSlide = `
+		@keyframes marquee-y-slide {
+				0% {
+					transform: translateY(calc(100% - ${textHeight}px));
+				}
+				100% {transform: translateY(calc(0% - ${textHeight}px));}
+			}		
+`
+
+
+
 		const animationYAlt = `@keyframes marquee-y-alt {
 				0% {transform: translateY(0%);}
-				25% {transform: translateY(calc(100% - ${this.textHeight()}px));}
+				25% {transform: translateY(calc(100% - ${textHeight}px));}
 				50% {transform: translateY(0%);}
-				75% {transform: translateY(calc(100% - ${this.textHeight()}px));}
+				75% {transform: translateY(calc(100% - ${textHeight}px));}
 				100% {transform: translateY(0%);}
 			}
 		`
 
 		stylesheet.insertRule(animationX)
 		stylesheet.insertRule(animationXAlt)
+		stylesheet.insertRule(animationXSlide)
 		stylesheet.insertRule(animationY)
 		stylesheet.insertRule(animationYAlt)
+		stylesheet.insertRule(animationYSlide)
 
 		this.shadow.adoptedStyleSheets = [stylesheet];
 	}
@@ -204,17 +226,28 @@ width: 100%;
 		let name: string = "";
 		let reverse: boolean = false;
 		if (this.direction === "right" || this.direction === "left") {
-			name = this.behavior !== "alternate" ? "marquee-x" : "marquee-x-alt"
+			if (this.behavior === "alternate") {
+				name = "marquee-x-alt";
+			} else if (this.behavior === "slide") {
+				name = "marquee-x-slide"
+			} else {
+				name === "marquee-x"
+			}
 			reverse = this.direction === "right" ? true : false
 		}
 
 		if (this.direction === "up" || this.direction === "down") {
-			name = this.behavior !== "alternate" ? "marquee-y" : "marquee-y-alt";
-			reverse = this.direction === "down" ? true : false
+			if (this.behavior === "alternate") {
+				name = "marquee-y-alt";
+			} else if (this.behavior === "slide") {
+				name = "marquee-y-slide"
+			} else {
+				name === "marquee-y"
+			} reverse = this.direction === "down" ? true : false
 		}
 
 		if (this.playing) {
-			return `${name} ${this.getDurationSeconds()} linear ${this.loop === "-1" ? "infinite" : this.loop} ${reverse ? "reverse" : ""}`
+			return `${name} ${this.getDurationSeconds()} linear ${this.getAnimationLoop()} ${reverse ? "reverse" : ""}`
 		} else {
 			return ""
 		}
@@ -238,6 +271,14 @@ width: 100%;
 			return this.duration
 		}
 		return `${this.duration}s`
+	}
+
+	private getAnimationLoop(): string {
+		if (this.behavior !== "slide") {
+			return this.loop
+		} else {
+			return ""
+		}
 	}
 
 	start() {

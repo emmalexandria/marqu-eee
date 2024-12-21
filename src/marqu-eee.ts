@@ -2,12 +2,45 @@ const marqueeTemplate = document.createElement('template')
 marqueeTemplate.innerHTML = `
 	<div class="wrapper">
 		<div class="text-wrapper">
-			<div class="slot-size">
 				<slot id="slot"></slot>
-			</div>
 		</div>
+
 	</div>
 `
+interface Dimension {
+	x: number,
+	y: number
+}
+
+function measureNode(node: Node): Dimension {
+	if (node.nodeType == Node.TEXT_NODE) {
+		const range = document.createRange();
+		range.selectNodeContents(node);
+
+		const rect = range.getBoundingClientRect();
+
+		return {
+			x: rect.width,
+			y: rect.height
+		}
+	}
+
+	if (node instanceof Element) {
+		const rect = node.getBoundingClientRect()
+
+
+
+		return {
+			x: rect.width,
+			y: rect.height
+		}
+	}
+
+	return {
+		x: 0,
+		y: 0
+	}
+}
 
 type Attribute = typeof MarqueeeElement.observedAttributes[number]
 
@@ -65,6 +98,15 @@ export class MarqueeeElement extends HTMLElement {
 	updateStyles() {
 		const stylesheet = new CSSStyleSheet()
 		stylesheet.replaceSync(`
+
+			:host {
+				display: block;
+				text-align: initial;
+				overflow: hidden;
+	
+			}
+
+
 			.wrapper {
 				display: flex;
 				overflow: clip;
@@ -78,22 +120,15 @@ export class MarqueeeElement extends HTMLElement {
 			.text-wrapper {
 				display: block;
 				overflow: clip;
-				height: ${this.getTextWrapperHeight()};
-				width: ${this.getTextWrapperWidth()};
-
+				width: 100%;
 				transform: translateX(-100%);
 				animation: ${this.getAnimationString()};
-				margin: ${this.getSlotMargin()}
+				margin: ${this.getSlotMargin()};
 			}
-			
-			:host .slot-size {
-				width: fit-content;
-			}
-
-			:host .wrapper slot {
-				display: block;
-				width: fit-content;
-			}
+slot {
+display: inline-block;
+width: 100%;
+}
 		`)
 
 		this.shadow.adoptedStyleSheets = [stylesheet]
@@ -138,11 +173,31 @@ export class MarqueeeElement extends HTMLElement {
 	}
 
 	private textWidth() {
-		return this.shadow.querySelector<HTMLDivElement>(".slot-size")?.offsetWidth ?? 0
+		const children = this.shadow.querySelector("slot")?.assignedNodes();
+		let maxWidth = 0;
+		if (children) {
+			Array.from(children).forEach((c) => {
+				const { x } = measureNode(c)
+				if (x > maxWidth) {
+					maxWidth = x
+				}
+			})
+		}
+		return maxWidth
 	}
 
 	private textHeight() {
-		return this.shadow.querySelector<HTMLDivElement>(".slot-size")?.offsetHeight ?? 0
+		const children = this.shadow.querySelector("slot")?.assignedNodes()
+		let maxHeight = 0;
+		if (children) {
+			Array.from(children).forEach((c) => {
+				const { y } = measureNode(c)
+				if (y > maxHeight) {
+					maxHeight = y
+				}
+			})
+		}
+		return maxHeight
 	}
 
 	private getAnimationString(): string {
@@ -183,24 +238,6 @@ export class MarqueeeElement extends HTMLElement {
 			return this.duration
 		}
 		return `${this.duration}s`
-	}
-
-	private getTextWrapperHeight() {
-		if (this.direction === "left" || this.direction === "right") {
-			return "fit-content";
-		}
-		if (this.direction === "up" || this.direction === "down") {
-			return "100%";
-		}
-	}
-
-	private getTextWrapperWidth() {
-		if (this.direction === "left" || this.direction === "right") {
-			return "100%";
-		}
-		if (this.direction === "up" || this.direction === "down") {
-			return "fit-content";
-		}
 	}
 
 	start() {

@@ -8,7 +8,33 @@
     <script type="module" src="./index.js"></script>
   </head>
   <body>
-		<marqu-eee direction="up"></marqu-eee>
+		<marqu-eee class="main" direction="up" center="x" duration="1.5">Welcome to my super awesome website</marqu-eee>
+
+		<marqu-eee class="main" direction="left" center="y" duration="2s">Welcome to my super awesome website</marqu-eee>
+
+		<marqu-eee direction="up" duration="2s" >This one goes up</marqu-eee>
+
+		<marqu-eee direction="down" duration="2s" >And this one goes down</marqu-eee>
+
+		<marqu-eee direction="down" behavior="alternate" duration="4s" style="display: block; width: 200px; height: 200px; border: solid;">
+			<marqu-eee behavior="alternate" duration="5s" style="display: block; width:200px;">
+				Hello
+			</marqu-eee>
+		</marqu-eee>
+
+		<style>
+			.main {
+				text-align: center;
+				height: 100px;
+				background-color: #33ff33;
+				width: 50%;
+				margin: 2rem 0;
+				display: block;
+				font-weight: bold;
+				color: #ff0000;
+			}
+			
+		</style>
   </body>
 </html>
 

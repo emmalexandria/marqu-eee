@@ -81,12 +81,12 @@ export class MarqueeeElement extends HTMLElement {
 		if (property === "center") {
 			this.center = newValue;
 		}
+		this.updateStyles()
 	}
 
 	updateStyles() {
 		const stylesheet = new CSSStyleSheet()
 		stylesheet.replaceSync(`
-
 			:host {
 				display: block;
 				text-align: initial;

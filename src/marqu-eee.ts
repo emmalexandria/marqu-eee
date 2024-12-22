@@ -111,10 +111,10 @@ export class MarqueeeElement extends HTMLElement {
 				animation: ${this.getAnimationString()};
 				margin: ${this.getSlotMargin()};
 			}
-slot {
-display: inline-block;
-width: 100%;
-}
+			slot {
+				display: inline-block;
+				width: 100%;
+			}
 		`)
 
 		this.shadow.adoptedStyleSheets = [stylesheet]
@@ -124,18 +124,14 @@ width: 100%;
 
 		const animationX = `
 			@keyframes marquee-x {
-				0% {
-					transform: translateX(100%);
-				}
+				0% { transform: translateX(100%);}
 				100% {transform: translateX(-${textWidth}px);}
 			}
 		`
 
 		const animationXSlide = `
 		@keyframes marquee-x-slide {
-				0% {
-					transform: translateX(100%);
-				}
+				0% { transform: translateX(100%);}
 				100% {transform: translateX(0%);}
 			}		`
 
@@ -154,9 +150,7 @@ width: 100%;
 
 		const animationYSlide = `
 		@keyframes marquee-y-slide {
-				0% {
-					transform: translateY(calc(100% - ${textHeight}px));
-				}
+				0% {transform: translateY(calc(100% - ${textHeight}px));}
 				100% {transform: translateY(calc(0% - ${textHeight}px));}
 			}		
 `

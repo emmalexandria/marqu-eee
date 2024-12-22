@@ -42,8 +42,3 @@ without a framework is perhaps one of the worst pains a web developer can experi
 in this project. HTML and CSS are written in raw JS template strings. Element height is calculated by creating an invisible div. 
 Things aren't good.
 
-
-
-```
-
-

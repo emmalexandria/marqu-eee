@@ -5,6 +5,8 @@
 
 --- 
 
+*If you aren't a coward, you'll read the [documentation site](https://www.marquee.cool) instead.*
+
 This project implements the `<marqu-eee>` web component as a replacement for the `<marquee>` tag. This one will never be deprecated!
 Some features such as `width`, `height`, `vspace`, and `hspace` have been removed for simplicity. 
 

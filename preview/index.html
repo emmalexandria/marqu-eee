@@ -8,28 +8,16 @@
     <script type="module" src="./index.js"></script>
   </head>
   <body>
-		<marqu-eee class="main" direction="up" behavior="slide" center="x" duration="1.5">Welcome to my super awesome website</marqu-eee>
-
-		<marqu-eee class="main" behavior="slide"  direction="left" center="y" duration="2s">Welcome to my super awesome website</marqu-eee>
-
-		<marqu-eee direction="up" duration="2s" >This one goes up</marqu-eee>
-
-		<marqu-eee direction="down" duration="2s" >And this one goes down</marqu-eee>
-
-		<marqu-eee direction="down" behavior="alternate" duration="4s" style="width: 200px; height: 200px; border: solid;">
-			<marqu-eee behavior="alternate" duration="5s" >
-				Hello
-			</marqu-eee>
+		<marqu-eee class="main" behavior="alternate" direction="up" center="x" duration="1.5">
+			<p style="margin-bottom: 6px; margin-top: 0;">
+			Welcome to my super awesome website
+			</p>
+			<p style="margin-bottom: 0px; line-height: 1; margin-top: 0;">
+			Hello
+			</p>
 		</marqu-eee>
 
-		<marquee behavior="slide">Hello</marquee>
-
-		<marquee direction="down" behavior="alternate" style="width: 200px; height: 200px">
-			<marquee behavior="alternate">
-				Hello
-			</marquee>
-		</marquee>
-
+		
 		<style>
 			.main {
 				height: 100px;

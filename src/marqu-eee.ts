@@ -12,34 +12,22 @@ interface Dimension {
 	y: number
 }
 
-function measureNode(node: Node): Dimension {
+function measureNodeWidth(node: Node): number {
 	if (node.nodeType == Node.TEXT_NODE) {
 		const range = document.createRange();
 		range.selectNodeContents(node);
 
 		const rect = range.getBoundingClientRect();
 
-		return {
-			x: rect.width,
-			y: rect.height
-		}
+		return rect.width;
 	}
 
 	if (node instanceof Element) {
 		const rect = node.getBoundingClientRect()
 
-
-
-		return {
-			x: rect.width,
-			y: rect.height
-		}
+		return rect.width;
 	}
-
-	return {
-		x: 0,
-		y: 0
-	}
+	return 0
 }
 
 type Attribute = typeof MarqueeeElement.observedAttributes[number]
@@ -118,7 +106,7 @@ export class MarqueeeElement extends HTMLElement {
 			.text-wrapper {
 				display: block;
 				overflow: clip;
-				width: 100%;
+				width: ${(this.direction === "up" || this.direction == "down") && this.center === "x" ? "fit-content" : "100%"};
 				transform: ${this.behavior === "slide" ? "" : "translateX(-100%)"};
 				animation: ${this.getAnimationString()};
 				margin: ${this.getSlotMargin()};
@@ -199,7 +187,7 @@ width: 100%;
 		let maxWidth = 0;
 		if (children) {
 			Array.from(children).forEach((c) => {
-				const { x } = measureNode(c)
+				const x = measureNodeWidth(c)
 				if (x > maxWidth) {
 					maxWidth = x
 				}
@@ -210,40 +198,45 @@ width: 100%;
 
 	private textHeight() {
 		const children = this.shadow.querySelector("slot")?.assignedNodes()
-		let maxHeight = 0;
+		const tempContainer = document.createElement("div")
+		tempContainer.style.position = "absolute";
+		tempContainer.style.visibility = "hidden";
+		tempContainer.style.top = '-9999px';
+
 		if (children) {
-			Array.from(children).forEach((c) => {
-				const { y } = measureNode(c)
-				if (y > maxHeight) {
-					maxHeight = y
-				}
+			Array.from(children).forEach((c, i) => {
+				const clone = c.cloneNode(true)
+				tempContainer.appendChild(clone)
 			})
 		}
-		return maxHeight
+		document.body.appendChild(tempContainer)
+		const height = tempContainer.offsetHeight;
+		document.body.removeChild(tempContainer)
+		return height;
 	}
 
 	private getAnimationString(): string {
 		let name: string = "";
 		let reverse: boolean = false;
 		if (this.direction === "right" || this.direction === "left") {
+			name = "marquee-x"
 			if (this.behavior === "alternate") {
 				name = "marquee-x-alt";
 			} else if (this.behavior === "slide") {
 				name = "marquee-x-slide"
-			} else {
-				name === "marquee-x"
 			}
 			reverse = this.direction === "right" ? true : false
 		}
 
 		if (this.direction === "up" || this.direction === "down") {
-			if (this.behavior === "alternate") {
+			name = "marquee-y"
+			if (this.behavior == "alternate") {
 				name = "marquee-y-alt";
-			} else if (this.behavior === "slide") {
+			}
+			else if (this.behavior == "slide") {
 				name = "marquee-y-slide"
-			} else {
-				name === "marquee-y"
-			} reverse = this.direction === "down" ? true : false
+			}
+			reverse = this.direction === "down" ? true : false
 		}
 
 		if (this.playing) {
